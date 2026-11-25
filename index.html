@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Do You Feel at Home in Your Body? — Interactive Tasks</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #ff4d94;
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #fff;
+    font-size: 3em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Main menu tiles */
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 28px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .tile {
+    background: #fff;
+    border-radius: 20px;
+    padding: 50px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  }
+  .tile-num {
+    font-size: 4em;
+    font-weight: bold;
+    color: #ff1a75;
+    margin-bottom: 18px;
+  }
+  .tile-name {
+    font-size: 2.1em;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+  }
+
+  /* Task screens */
+  .task-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .task-title {
+    font-size: 2.6em;
+    color: #ff1a75;
+    margin-bottom: 28px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 16px 36px;
+    font-size: 1.45em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn-primary { background: #ff1a75; color: #fff; }
+  .btn-primary:hover { background: #d91463; }
+  .btn-secondary { background: #e0e0e0; color: #333; }
+  .btn-secondary:hover { background: #ccc; }
+  .btn-success { background: #4caf50; color: #fff; }
+  .btn-success:hover { background: #3d9140; }
+  .btn-group { text-align: center; margin-top: 28px; }
+
+  /* Task 1 - Quiz */
+  .question-box {
+    background: #fff0f6;
+    padding: 35px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+  }
+  .question-text {
+    font-size: 2em;
+    margin-bottom: 26px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .answer-option {
+    display: block;
+    background: #fff;
+    border: 2px solid #ddd;
+    padding: 22px 26px;
+    margin: 14px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.6em;
+    transition: all 0.2s;
+  }
+  .answer-option:hover { border-color: #ff1a75; }
+  .answer-option.selected {
+    background: #ff1a75;
+    color: #fff;
+    border-color: #ff1a75;
+  }
+  .progress-indicator {
+    text-align: center;
+    font-size: 1.5em;
+    color: #666;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .result-box {
+    background: #fff0f6;
+    padding: 40px;
+    border-radius: 14px;
+    text-align: center;
+  }
+  .result-score {
+    font-size: 4.2em;
+    font-weight: bold;
+    color: #ff1a75;
+    margin: 18px 0;
+  }
+  .result-desc {
+    font-size: 1.7em;
+    line-height: 1.5;
+    color: #333;
+  }
+
+  /* Task 2 - AR-Guide */
+  .ar-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.6em;
+  }
+  .ar-table td {
+    padding: 22px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  .ar-table td:first-child { width: 82%; }
+  .ar-table td:last-child {
+    width: 18%;
+    text-align: center;
+  }
+  .icon-btn {
+    width: 70px;
+    height: 70px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 2.2em;
+    margin: 0 5px;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { border-color: #ff1a75; }
+  .icon-btn.selected-yes { background: #c8e6c9; border-color: #4caf50; }
+  .icon-btn.selected-no { background: #ffcdd2; border-color: #f44336; }
+  .icon-btn.correct { background: #4caf50 !important; color: #fff; border-color: #2e7d32 !important; }
+  .icon-btn.wrong { background: #f44336 !important; color: #fff; border-color: #c62828 !important; }
+
+  /* Task 3 - Reading */
+  .fragment-box {
+    background: #fff0f6;
+    padding: 35px;
+    border-radius: 14px;
+    margin-bottom: 26px;
+    font-size: 1.75em;
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .fragment-box .keyword {
+    background: #c8e6c9;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-style: normal;
+    font-weight: bold;
+  }
+  .headings-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+  .heading-option {
+    background: #fff;
+    border: 2px solid #ddd;
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .heading-option:hover { border-color: #ff1a75; }
+  .heading-option.selected { background: #ff1a75; color: #fff; border-color: #ff1a75; }
+  .heading-option.correct { background: #4caf50 !important; color: #fff; border-color: #2e7d32 !important; }
+  .heading-option.wrong { background: #f44336 !important; color: #fff; border-color: #c62828 !important; }
+  .heading-option.used { display: none; }
+
+  /* Task 4 - True/False */
+  .statement-box {
+    background: #fff0f6;
+    padding: 35px;
+    border-radius: 14px;
+    margin-bottom: 26px;
+    font-size: 1.8em;
+    line-height: 1.5;
+  }
+  .tf-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+  }
+  .tf-btn {
+    padding: 22px 40px;
+    font-size: 1.7em;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    min-width: 200px;
+  }
+  .tf-btn:hover { border-color: #ff1a75; }
+  .tf-btn.selected { background: #ff1a75; color: #fff; border-color: #ff1a75; }
+  .tf-btn.correct { background: #4caf50 !important; color: #fff; border-color: #2e7d32 !important; }
+  .tf-btn.wrong { background: #f44336 !important; color: #fff; border-color: #c62828 !important; }
+
+  /* Task 5 - Match */
+  .match-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 26px;
+  }
+  .match-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .match-item {
+    background: #fff;
+    border: 2px solid #ddd;
+    padding: 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.5em;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .match-item:hover { border-color: #ff1a75; }
+  .match-item.selected { background: #ff1a75; color: #fff; border-color: #ff1a75; }
+  .match-item.matched { background: #4caf50 !important; color: #fff; border-color: #2e7d32 !important; cursor: default; }
+  .match-item.wrong-flash { background: #f44336 !important; color: #fff; border-color: #c62828 !important; }
+
+  /* Task 6 - Odd one out */
+  .sentence-box {
+    background: #fff0f6;
+    padding: 35px;
+    border-radius: 14px;
+    margin-bottom: 26px;
+    font-size: 1.8em;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .word-chip {
+    display: inline-block;
+    padding: 12px 24px;
+    margin: 8px;
+    border-radius: 26px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.2em;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .word-chip.blue { background: #bbdefb; color: #0d47a1; }
+  .word-chip.red { background: #ffcdd2; color: #b71c1c; }
+  .word-chip.green { background: #c8e6c9; color: #1b5e20; }
+  .word-chip.purple { background: #e1bee7; color: #4a148c; }
+  .word-chip.selected { border-color: #333; transform: scale(1.1); }
+  .word-chip.correct { background: #4caf50 !important; color: #fff !important; border-color: #2e7d32 !important; }
+  .word-chip.wrong { background: #f44336 !important; color: #fff !important; border-color: #c62828 !important; }
+
+  /* Task 7 - Tic Tac Toe */
+  .ttt-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 180px);
+    grid-template-rows: repeat(3, 180px);
+    gap: 12px;
+    background: #ff1a75;
+    padding: 12px;
+    border-radius: 16px;
+  }
+  .ttt-cell {
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.55em;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+    color: #333;
+    transition: all 0.3s;
+  }
+  .ttt-cell.highlight {
+    background: #4caf50 !important;
+    color: #fff !important;
+    transform: scale(1.05);
+  }
+  .ttt-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ttt-controls .btn {
+    min-width: 180px;
+    font-size: 1.55em;
+    padding: 20px 32px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Do You Feel at Home in Your Body?</h1>
+
+<!-- MAIN MENU -->
+<div id="menu" class="screen active">
+  <div class="menu">
+    <div class="tile" onclick="showScreen('task1')">
+      <div class="tile-num">1</div>
+      <div class="tile-name">Minute of honesty</div>
+    </div>
+    <div class="tile" onclick="showScreen('task2')">
+      <div class="tile-num">2</div>
+      <div class="tile-name">AR-Guide</div>
+    </div>
+    <div class="tile" onclick="showScreen('task3')">
+      <div class="tile-num">3</div>
+      <div class="tile-name">Reading!</div>
+    </div>
+    <div class="tile" onclick="showScreen('task4')">
+      <div class="tile-num">4</div>
+      <div class="tile-name">True / False</div>
+    </div>
+    <div class="tile" onclick="showScreen('task5')">
+      <div class="tile-num">5</div>
+      <div class="tile-name">Match the words to their meanings</div>
+    </div>
+    <div class="tile" onclick="showScreen('task6')">
+      <div class="tile-num">6</div>
+      <div class="tile-name">Vocabulary matching</div>
+    </div>
+    <div class="tile" onclick="showScreen('task7')">
+      <div class="tile-num">7</div>
+      <div class="tile-name">TIC-TAC-TOE!</div>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 1: Minute of honesty -->
+<div id="task1" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 1. Minute of honesty</div>
+    <div id="quiz-area">
+      <div class="progress-indicator" id="q-progress">Question 1 of 5</div>
+      <div class="question-box">
+        <div class="question-text" id="q-text"></div>
+        <div id="q-options"></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+        <button class="btn btn-primary" id="q-next" onclick="nextQuestion()">Next →</button>
+        <button class="btn btn-success" id="q-result" onclick="showResult()" style="display:none;">Result</button>
+      </div>
+    </div>
+    <div id="quiz-result" style="display:none;">
+      <div class="result-box">
+        <div style="font-size:1.7em;">Your total score:</div>
+        <div class="result-score" id="final-score">0</div>
+        <div class="result-desc" id="final-desc"></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="showScreen('menu')">← Back to menu</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">Restart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 2: AR-Guide -->
+<div id="task2" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 2. AR-Guide</div>
+    <p style="text-align:center; font-size:1.55em; margin-bottom:24px; color:#555;">
+      Read the statements. Mark each as <b>true</b> (✓) or <b>false</b> (✗) according to the text.
+    </p>
+    <table class="ar-table" id="ar-table"></table>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+      <button class="btn btn-success" onclick="checkAR()">Check</button>
+      <button class="btn btn-primary" onclick="resetAR()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 3: Reading -->
+<div id="task3" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 3. Reading!</div>
+    <div class="progress-indicator" id="r-progress">Fragment 1 of 10</div>
+    <div class="fragment-box" id="fragment-text"></div>
+    <div class="headings-list" id="headings-list"></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+      <button class="btn btn-success" onclick="checkReading()">Check</button>
+      <button class="btn btn-primary" id="r-next" onclick="nextFragment()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 4: True/False -->
+<div id="task4" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 4. True / False / Not Stated</div>
+    <div class="progress-indicator" id="tf-progress">Statement 1 of 5</div>
+    <div class="statement-box" id="tf-statement"></div>
+    <div class="tf-buttons" id="tf-buttons">
+      <button class="tf-btn" data-val="TRUE" onclick="selectTF(this)">TRUE</button>
+      <button class="tf-btn" data-val="FALSE" onclick="selectTF(this)">FALSE</button>
+      <button class="tf-btn" data-val="NOT STATED" onclick="selectTF(this)">NOT STATED</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+      <button class="btn btn-success" onclick="checkTF()">Check</button>
+      <button class="btn btn-primary" id="tf-next" onclick="nextTF()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 5: Match -->
+<div id="task5" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 5. Match the words to their meanings</div>
+    <p style="text-align:center; font-size:1.5em; margin-bottom:24px; color:#555;">
+      Click a word on the left, then click its meaning on the right.
+    </p>
+    <div class="match-container">
+      <div class="match-column" id="match-left"></div>
+      <div class="match-column" id="match-right"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 6: Vocabulary matching -->
+<div id="task6" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 6. Vocabulary matching</div>
+    <p style="text-align:center; font-size:1.5em; margin-bottom:24px; color:#555;">
+      Click the word that does NOT fit the sentence.
+    </p>
+    <div class="progress-indicator" id="v-progress">Sentence 1 of 5</div>
+    <div class="sentence-box" id="v-sentence"></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+      <button class="btn btn-success" onclick="checkVocab()">Check</button>
+      <button class="btn btn-primary" id="v-next" onclick="nextVocab()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK 7: Tic-Tac-Toe -->
+<div id="task7" class="screen">
+  <div class="task-container">
+    <div class="task-title">Task 7. TIC-TAC-TOE!</div>
+    <div class="ttt-wrapper">
+      <div class="ttt-grid" id="ttt-grid"></div>
+      <div class="ttt-controls">
+        <button class="btn btn-success" onclick="startTTT()">START</button>
+        <button class="btn btn-primary" onclick="goTTT()">GO</button>
+        <button class="btn btn-secondary" onclick="restartTTT()">RESTART</button>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('menu')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- NAVIGATION ---------- */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'task1') initQuiz();
+  if (id === 'task2') initAR();
+  if (id === 'task3') initReading();
+  if (id === 'task4') initTF();
+  if (id === 'task5') initMatch();
+  if (id === 'task6') initVocab();
+  if (id === 'task7') initTTT();
+}
+
+/* ---------- TASK 1: QUIZ ---------- */
+const quizData = [
+  {
+    q: "How often do you look in the mirror and feel unhappy with your appearance?",
+    opts: ["Rarely", "Sometimes", "Often"],
+    scores: [1, 2, 3]
+  },
+  {
+    q: "Do you compare your appearance to people in social media or movies?",
+    opts: ["No, I don't", "Sometimes", "Yes, constantly"],
+    scores: [1, 2, 3]
+  },
+  {
+    q: "If you get a pimple before an important event, how do you feel?",
+    opts: ["It's fine, nobody cares", "A bit annoyed", "I want to cancel everything"],
+    scores: [1, 2, 3]
+  },
+  {
+    q: "Do you think your classmates notice every small change in your looks?",
+    opts: ["No, they have their own problems", "Maybe sometimes", "Yes, they judge me"],
+    scores: [1, 2, 3]
+  },
+  {
+    q: "How often do you exercise or eat healthy just to change how you look, not for health?",
+    opts: ["Never", "Sometimes", "Often"],
+    scores: [1, 2, 3]
+  }
+];
+let qIdx = 0, qScore = 0, qAnswers = [];
+
+function initQuiz() {
+  qIdx = 0; qScore = 0; qAnswers = [];
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+function renderQuestion() {
+  const q = quizData[qIdx];
+  document.getElementById('q-progress').textContent = `Question ${qIdx+1} of ${quizData.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const div = document.createElement('div');
+    div.className = 'answer-option';
+    div.textContent = o;
+    div.onclick = () => selectAnswer(div, i);
+    opts.appendChild(div);
+  });
+  document.getElementById('q-next').style.display = (qIdx === quizData.length - 1) ? 'none' : 'inline-block';
+  document.getElementById('q-result').style.display = (qIdx === quizData.length - 1) ? 'inline-block' : 'none';
+}
+function selectAnswer(el, idx) {
+  document.querySelectorAll('#q-options .answer-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  qAnswers[qIdx] = idx;
+}
+function nextQuestion() {
+  if (qAnswers[qIdx] === undefined) { alert('Please choose an answer.'); return; }
+  qScore += quizData[qIdx].scores[qAnswers[qIdx]];
+  qIdx++;
+  renderQuestion();
+}
+function showResult() {
+  if (qAnswers[qIdx] === undefined) { alert('Please choose an answer.'); return; }
+  qScore += quizData[qIdx].scores[qAnswers[qIdx]];
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  document.getElementById('final-score').textContent = qScore + ' / 15';
+  let desc = '';
+  if (qScore <= 7) desc = "You are confident and relaxed! You understand that appearance is just one part of who you are.";
+  else if (qScore <= 11) desc = "Normal teenage doubts. You sometimes worry, but generally, you are okay. The text we are reading today is exactly for you!";
+  else desc = "You focus too much on appearance. It's time to read the text and remember: adverts sell fantasy, not reality!";
+  document.getElementById('final-desc').textContent = desc;
+}
+function restartQuiz() { initQuiz(); }
+
+/* ---------- TASK 2: AR-GUIDE ---------- */
+const arData = [
+  { stmt: "Almost no one wants to change their appearance.", correct: false },
+  { stmt: "Girls and boys start changing at the exact same speed.", correct: false },
+  { stmt: "Media images show realistic and achievable body types.", correct: false },
+  { stmt: "It is better to exercise and eat healthily than to try to look like an advert.", correct: true },
+  { stmt: "Your classmates notice every single pimple on your face.", correct: false },
+  { stmt: "Confidence and liking yourself make others like you too.", correct: true }
+];
+function initAR() {
+  const t = document.getElementById('ar-table');
+  t.innerHTML = '';
+  arData.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}. ${d.stmt}</td>
+      <td>
+        <button class="icon-btn" data-row="${i}" data-val="yes" onclick="selectAR(this)">✓</button>
+        <button class="icon-btn" data-row="${i}" data-val="no" onclick="selectAR(this)">✗</button>
+      </td>`;
+    t.appendChild(tr);
+  });
+}
+function selectAR(btn) {
+  const row = btn.dataset.row;
+  document.querySelectorAll(`.icon-btn[data-row="${row}"]`).forEach(b => b.classList.remove('selected-yes','selected-no'));
+  btn.classList.add(btn.dataset.val === 'yes' ? 'selected-yes' : 'selected-no');
+}
+function checkAR() {
+  arData.forEach((d, i) => {
+    const yes = document.querySelector(`.icon-btn[data-row="${i}"][data-val="yes"]`);
+    const no = document.querySelector(`.icon-btn[data-row="${i}"][data-val="no"]`);
+    const userYes = yes.classList.contains('selected-yes');
+    const userNo = no.classList.contains('selected-no');
+    const userAnswer = userYes ? true : (userNo ? false : null);
+    yes.classList.remove('correct','wrong');
+    no.classList.remove('correct','wrong');
+    if (userAnswer === null) return;
+    if (userAnswer === d.correct) {
+      (d.correct ? yes : no).classList.add('correct');
+    } else {
+      (userAnswer ? yes : no).classList.add('wrong');
+      (d.correct ? yes : no).classList.add('correct');
+    }
+  });
+}
+function resetAR() { initAR(); }
+
+/* ---------- TASK 3: READING ---------- */
+const fragments = [
+  { text: "It's Monday morning and while you are getting dressed, you're looking at yourself in the mirror.", keywords: ["Monday morning", "looking at yourself in the mirror"] },
+  { text: "'I'm too skinny. I'd like to put on a little weight and be a bit taller and more muscular,' you think.", keywords: ["too skinny", "put on weight", "taller", "muscular"] },
+  { text: "I also wouldn't mind thicker hair, longer legs, better teeth and a smaller nose.", keywords: ["thicker hair", "longer legs", "better teeth", "smaller nose"] },
+  { text: "Speaking of my nose, is that a pimple on it? Oh, here we go again! I can't stand people staring at me.", keywords: ["pimple", "here we go again", "can't stand"] },
+  { text: "Do these remarks sound familiar? Almost everyone would like to change something about their bodies.", keywords: ["sound familiar", "almost everyone"] },
+  { text: "Teenagers feel that way quite often because their bodies change while they are growing up. As your body changes, so does the way you feel about your physical appearance.", keywords: ["bodies change", "growing up"] },
+  { text: "Girls usually start changing sooner than boys. Sometimes, they suddenly put on weight as their bodies need fat to grow.", keywords: ["Girls", "sooner", "put on weight"] },
+  { text: "On the other hand, boys notice their shoulders getting wider and their voices getting deeper. These changes usually take place over two to five years.", keywords: ["boys", "shoulders wider", "voices deeper"] },
+  { text: "Media images from TV, movies and advertising may also affect your self-esteem. Women and girls on TV and in magazines are usually thin while men look strong and very muscular.", keywords: ["Media images", "TV", "advertising", "self-esteem"] },
+  { text: "Remember that it's more important to exercise regularly and eat healthily than to try to change your body to fit an unrealistic image... If you like yourself and the way you look, other people will too!", keywords: ["exercise regularly", "eat healthily", "like yourself"] }
+];
+const headings = [
+  "A. The Media Influence",
+  "B. The Morning Mirror",
+  "C. You Are Not Alone",
+  "D. The Real Solution",
+  "E. Changes in Boys",
+  "F. The Panic",
+  "G. Specific Details",
+  "H. Growing Pains",
+  "I. Changes in Girls",
+  "J. The Wish List",
+  "K. The Mirror's Lie"
+];
+const correctHeadings = ["B","J","G","F","C","H","I","E","A","D"];
+let rIdx = 0, rSelected = null, usedHeadings = new Set();
+
+function initReading() {
+  rIdx = 0; rSelected = null; usedHeadings = new Set();
+  renderFragment();
+}
+function renderFragment() {
+  document.getElementById('r-progress').textContent = `Fragment ${rIdx+1} of ${fragments.length}`;
+  const f = fragments[rIdx];
+  let html = f.text;
+  f.keywords.forEach(k => {
+    html = html.replace(k, `<span class="keyword">${k}</span>`);
+  });
+  document.getElementById('fragment-text').innerHTML = html;
+  const list = document.getElementById('headings-list');
+  list.innerHTML = '';
+  headings.forEach(h => {
+    if (usedHeadings.has(h[0])) return;
+    const div = document.createElement('div');
+    div.className = 'heading-option';
+    div.textContent = h;
+    div.onclick = () => selectHeading(div, h);
+    list.appendChild(div);
+  });
+  rSelected = null;
+}
+function selectHeading(el, h) {
+  document.querySelectorAll('.heading-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  rSelected = h;
+}
+function checkReading() {
+  if (!rSelected) { alert('Please choose a heading.'); return; }
+  const correct = correctHeadings[rIdx];
+  document.querySelectorAll('.heading-option').forEach(o => {
+    o.classList.remove('correct','wrong');
+    if (o.textContent[0] === correct) {
+      o.classList.add('correct');
+    } else if (o.classList.contains('selected')) {
+      o.classList.add('wrong');
+    }
+  });
+}
+function nextFragment() {
+  if (!rSelected) { alert('Please choose a heading.'); return; }
+  usedHeadings.add(rSelected[0]);
+  rIdx++;
+  if (rIdx >= fragments.length) {
+    alert('Well done! You have finished all fragments.');
+    showScreen('menu');
+    return;
+  }
+  renderFragment();
+}
+
+/* ---------- TASK 4: TRUE/FALSE ---------- */
+const tfData = [
+  { stmt: "Boys and girls start their physical changes at the exact same time.", answer: "FALSE" },
+  { stmt: "The text states that adverts show realistic images of people.", answer: "FALSE" },
+  { stmt: "The text mentions that drinking 2 liters of water a day helps with pimples.", answer: "NOT STATED" },
+  { stmt: "It takes about two to five years for the major physical changes of growing up to take place.", answer: "TRUE" },
+  { stmt: "Your classmates notice every single pimple on your face.", answer: "FALSE" }
+];
+let tfIdx = 0, tfSelected = null;
+function initTF() { tfIdx = 0; tfSelected = null; renderTF(); }
+function renderTF() {
+  document.getElementById('tf-progress').textContent = `Statement ${tfIdx+1} of ${tfData.length}`;
+  document.getElementById('tf-statement').textContent = tfData[tfIdx].stmt;
+  document.querySelectorAll('.tf-btn').forEach(b => {
+    b.classList.remove('selected','correct','wrong');
+  });
+  tfSelected = null;
+}
+function selectTF(btn) {
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  tfSelected = btn.dataset.val;
+}
+function checkTF() {
+  if (!tfSelected) { alert('Please choose an answer.'); return; }
+  const correct = tfData[tfIdx].answer;
+  document.querySelectorAll('.tf-btn').forEach(b => {
+    b.classList.remove('correct','wrong');
+    if (b.dataset.val === correct) b.classList.add('correct');
+    else if (b.classList.contains('selected')) b.classList.add('wrong');
+  });
+}
+function nextTF() {
+  if (!tfSelected) { alert('Please choose an answer.'); return; }
+  tfIdx++;
+  if (tfIdx >= tfData.length) {
+    alert('Well done! You have finished all statements.');
+    showScreen('menu');
+    return;
+  }
+  renderTF();
+}
+
+/* ---------- TASK 5: MATCH ---------- */
+const matchPairs = [
+  { word: "match", meaning: "to be the same or similar" },
+  { word: "looking", meaning: "appearing in a certain way" },
+  { word: "false", meaning: "not true or real" },
+  { word: "pride", meaning: "a feeling of pleasure about something" },
+  { word: "well-built", meaning: "having a strong, solid body" },
+  { word: "develops", meaning: "grows or changes over time" },
+  { word: "too concerned", meaning: "worried too much" },
+  { word: "comments", meaning: "remarks or opinions" },
+  { word: "influences", meaning: "has an effect on" },
+  { word: "concentrate", meaning: "to focus attention" },
+  { word: "staring", meaning: "looking fixedly for a long time" },
+  { word: "affects", meaning: "produces a change in" }
+];
+let mLeftSel = null, mRightSel = null, mMatched = 0;
+function initMatch() {
+  mLeftSel = null; mRightSel = null; mMatched = 0;
+  const leftCol = document.getElementById('match-left');
+  const rightCol = document.getElementById('match-right');
+  leftCol.innerHTML = ''; rightCol.innerHTML = '';
+  const leftWords = [...matchPairs].sort(() => Math.random() - 0.5);
+  const rightWords = [...matchPairs].sort(() => Math.random() - 0.5);
+  leftWords.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'match-item';
+    d.textContent = p.word;
+    d.dataset.word = p.word;
+    d.dataset.side = 'left';
+    d.onclick = () => selectMatch(d);
+    leftCol.appendChild(d);
+  });
+  rightWords.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'match-item';
+    d.textContent = p.meaning;
+    d.dataset.word = p.word;
+    d.dataset.side = 'right';
+    d.onclick = () => selectMatch(d);
+    rightCol.appendChild(d);
+  });
+}
+function selectMatch(el) {
+  if (el.classList.contains('matched')) return;
+  if (el.dataset.side === 'left') {
+    document.querySelectorAll('#match-left .match-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    mLeftSel = el;
+  } else {
+    document.querySelectorAll('#match-right .match-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    mRightSel = el;
+  }
+  if (mLeftSel && mRightSel) {
+    if (mLeftSel.dataset.word === mRightSel.dataset.word) {
+      mLeftSel.classList.add('matched');
+      mRightSel.classList.add('matched');
+      mLeftSel.classList.remove('selected');
+      mRightSel.classList.remove('selected');
+      mMatched++;
+      if (mMatched === matchPairs.length) {
+        setTimeout(() => alert('Excellent! All pairs matched!'), 300);
+      }
+    } else {
+      mLeftSel.classList.add('wrong-flash');
+      mRightSel.classList.add('wrong-flash');
+      const l = mLeftSel, r = mRightSel;
+      setTimeout(() => {
+        l.classList.remove('wrong-flash','selected');
+        r.classList.remove('wrong-flash','selected');
+      }, 700);
+    }
+    mLeftSel = null; mRightSel = null;
+  }
+}
+
+/* ---------- TASK 6: VOCABULARY ---------- */
+const vocabData = [
+  {
+    sentence: "She is ___, ___, ___ or ___ .",
+    words: [
+      { w: "slim", color: "blue", fits: true },
+      { w: "overweight", color: "red", fits: false },
+      { w: "thin", color: "green", fits: true },
+      { w: "skinny", color: "purple", fits: true }
+    ]
+  },
+  {
+    sentence: "He has got ___, ___, ___ or ___ hair.",
+    words: [
+      { w: "curly", color: "blue", fits: true },
+      { w: "straight", color: "red", fits: true },
+      { w: "wavy", color: "green", fits: true },
+      { w: "bald", color: "purple", fits: false }
+    ]
+  },
+  {
+    sentence: "The boy is ___, ___, ___ or ___ .",
+    words: [
+      { w: "tall", color: "blue", fits: true },
+      { w: "short", color: "red", fits: true },
+      { w: "medium-height", color: "green", fits: true },
+      { w: "fat", color: "purple", fits: false }
+    ]
+  },
+  {
+    sentence: "Her eyes are ___, ___, ___ or ___ .",
+    words: [
+      { w: "blue", color: "blue", fits: true },
+      { w: "green", color: "red", fits: true },
+      { w: "brown", color: "green", fits: true },
+      { w: "long", color: "purple", fits: false }
+    ]
+  },
+  {
+    sentence: "He is ___, ___, ___ and ___ .",
+    words: [
+      { w: "optimistic", color: "blue", fits: true },
+      { w: "sensitive", color: "red", fits: true },
+      { w: "caring", color: "green", fits: true },
+      { w: "ugly", color: "purple", fits: false }
+    ]
+  }
+];
+let vIdx = 0, vSelected = null;
+function initVocab() { vIdx = 0; vSelected = null; renderVocab(); }
+function renderVocab() {
+  document.getElementById('v-progress').textContent = `Sentence ${vIdx+1} of ${vocabData.length}`;
+  const d = vocabData[vIdx];
+  const box = document.getElementById('v-sentence');
+  box.innerHTML = '';
+  const parts = d.sentence.split('___');
+  let wordIdx = 0;
+  parts.forEach((p, i) => {
+    box.appendChild(document.createTextNode(p));
+    if (i < parts.length - 1) {
+      const chip = document.createElement('span');
+      chip.className = 'word-chip ' + d.words[wordIdx].color;
+      chip.textContent = d.words[wordIdx].w;
+      chip.dataset.fits = d.words[wordIdx].fits;
+      chip.onclick = () => selectVocab(chip);
+      box.appendChild(chip);
+      wordIdx++;
+    }
+  });
+  vSelected = null;
+}
+function selectVocab(el) {
+  document.querySelectorAll('.word-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  vSelected = el;
+}
+function checkVocab() {
+  if (!vSelected) { alert('Please choose a word.'); return; }
+  document.querySelectorAll('.word-chip').forEach(c => {
+    c.classList.remove('correct','wrong');
+    if (c.dataset.fits === 'false') c.classList.add('correct');
+    else if (c.classList.contains('selected')) c.classList.add('wrong');
+  });
+}
+function nextVocab() {
+  if (!vSelected) { alert('Please choose a word.'); return; }
+  vIdx++;
+  if (vIdx >= vocabData.length) {
+    alert('Well done! You have finished all sentences.');
+    showScreen('menu');
+    return;
+  }
+  renderVocab();
+}
+
+/* ---------- TASK 7: TIC-TAC-TOE ---------- */
+const tttWords = ["blush", "postpone", "put on weight", "well-built", "self-esteem", "stubborn", "optimistic", "stare", "unrealistic"];
+const tttLines = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+let tttCurrent = [...tttWords];
+let tttLineIdx = 0;
+let tttStarted = false;
+
+function initTTT() {
+  tttCurrent = [...tttWords];
+  tttLineIdx = 0;
+  tttStarted = false;
+  renderTTT();
+}
+function renderTTT() {
+  const grid = document.getElementById('ttt-grid');
+  grid.innerHTML = '';
+  tttCurrent.forEach(w => {
+    const c = document.createElement('div');
+    c.className = 'ttt-cell';
+    c.textContent = tttStarted ? w : '';
+    grid.appendChild(c);
+  });
+}
+function startTTT() {
+  tttStarted = true;
+  renderTTT();
+}
+function goTTT() {
+  if (!tttStarted) { alert('Press START first.'); return; }
+  const cells = document.querySelectorAll('.ttt-cell');
+  cells.forEach(c => c.classList.remove('highlight'));
+  const line = tttLines[tttLineIdx];
+  line.forEach(i => cells[i].classList.add('highlight'));
+  tttLineIdx = (tttLineIdx + 1) % tttLines.length;
+}
+function restartTTT() {
+  tttCurrent = [...tttWords].sort(() => Math.random() - 0.5);
+  tttLineIdx = 0;
+  tttStarted = true;
+  renderTTT();
+}
+</script>
+
+</body>
+</html>
